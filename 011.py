@@ -95,9 +95,15 @@ def blackjack():
     #Add the sum of both hands: user and computer
     usr_sum = ref_deck.get(usr_hand[0])[1]+ref_deck.get(usr_hand[1])[1]
     comp_sum = ref_deck.get(comp_hand[0])[1]+ref_deck.get(comp_hand[1])[1]
-    if usr_sum == 21:
-        print(f"You have a {ref_deck.get(usr_hand[0])[0]} and a {ref_deck.get(usr_hand[1])[0]}. That's BlackJack, you win.")
-        return
+    if usr_sum == 21 or comp_sum == 21:
+        if comp_sum == 21 and usr_sum == 21:
+            print(f"You have a {ref_deck.get(usr_hand[0])[0]} and a {ref_deck.get(usr_hand[1])[0]}. That's BlackJack.")
+            print(f"The dealer has a {ref_deck.get(comp_hand[0])[0]} and a {ref_deck.get(comp_hand[1])[0]}. That's BlackJack.")
+            print(f"You push.")
+        elif usr_sum == 21:
+            print(f"You have a {ref_deck.get(usr_hand[0])[0]} and a {ref_deck.get(usr_hand[1])[0]}. That's BlackJack, you win.")
+        elif comp_sum == 21:
+            print(f"The dealer has a {ref_deck.get(comp_hand[0])[0]} and a {ref_deck.get(comp_hand[1])[0]}. That's BlackJack, you lose.")
     else:
         print(f"Your cards: {ref_deck.get(usr_hand[0])[0]} and {ref_deck.get(usr_hand[1])[0]}.")
         print(f"Dealer's first card: {ref_deck.get(comp_hand[0])[0]}")
