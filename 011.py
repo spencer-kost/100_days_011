@@ -51,7 +51,8 @@ ref_deck = {
     37: ['Jack of Hearts', 10], 38: ['Jack of Diamonds', 10], 39: ['Jack of Clubs', 10], 40: ['Jack of Spades', 10],
     41: ['Queen of Hearts', 10], 42: ['Queen of Diamonds', 10], 43: ['Queen of Clubs', 10], 44: ['Queen of Spades', 10],
     45: ['King of Hearts', 10], 46: ['King of Diamonds', 10], 47: ['King of Clubs', 10], 48: ['King of Spades', 10],
-    49: ['Ace of Hearts', 11], 50: ['Ace of Diamonds', 11], 51: ['Ace of Clubs', 11], 52: ['Ace of Spades', 11]
+    49: ['Ace of Hearts', 11], 50: ['Ace of Diamonds', 11], 51: ['Ace of Clubs', 11], 52: ['Ace of Spades', 11],
+    53: ['Ace of Hearts', 1], 54: ['Ace of Diamonds', 1], 55: ['Ace of Clubs', 1], 56: ['Ace of Spades', 1],
 }
 
 def deal():
@@ -60,6 +61,7 @@ def deal():
     del deck[card]
     return card
 def redeal():
+    global deck
     deck = {
         1: ['2 of Hearts', 2], 2: ['2 of Diamonds', 2], 3: ['2 of Clubs', 2], 4: ['2 of Spades', 2],
         5: ['3 of Hearts', 3], 6: ['3 of Diamonds', 3], 7: ['3 of Clubs', 3], 8: ['3 of Spades', 3],
@@ -73,7 +75,7 @@ def redeal():
         37: ['Jack of Hearts', 10], 38: ['Jack of Diamonds', 10], 39: ['Jack of Clubs', 10], 40: ['Jack of Spades', 10],
         41: ['Queen of Hearts', 10], 42: ['Queen of Diamonds', 10], 43: ['Queen of Clubs', 10], 44: ['Queen of Spades', 10],
         45: ['King of Hearts', 10], 46: ['King of Diamonds', 10], 47: ['King of Clubs', 10], 48: ['King of Spades', 10],
-        49: ['Ace of Hearts', [1, 11]], 50: ['Ace of Diamonds', [1, 11]], 51: ['Ace of Clubs', [1, 11]], 52: ['Ace of Spades', [1, 11]]
+        49: ['Ace of Hearts', 11], 50: ['Ace of Diamonds', 11], 51: ['Ace of Clubs', 11], 52: ['Ace of Spades', 11]
     }
 
 def read_card(player_hand):
@@ -90,12 +92,17 @@ def blackjack():
     print(Asset.logo)
     comp_hand = [deal(), deal()] #deal two cards to the comptuer
     usr_hand = [deal(), deal()] #deal two cards to the user
-    print(f"You have a {ref_deck.get(usr_hand[0])[0]} and a {ref_deck.get(usr_hand[1])[0]}.")
-    print(f"The dealer is showing a {ref_deck.get(comp_hand[0])[0]}")
-
     #Add the sum of both hands: user and computer
     usr_sum = ref_deck.get(usr_hand[0])[1]+ref_deck.get(usr_hand[1])[1]
     comp_sum = ref_deck.get(comp_hand[0])[1]+ref_deck.get(comp_hand[1])[1]
+    if usr_sum == 21:
+        print(f"You have a {ref_deck.get(usr_hand[0])[0]} and a {ref_deck.get(usr_hand[1])[0]}. That's BlackJack, you win.")
+        return
+    else:
+        print(f"Your cards: {ref_deck.get(usr_hand[0])[0]} and {ref_deck.get(usr_hand[1])[0]}.")
+        print(f"Dealer's first card: {ref_deck.get(comp_hand[0])[0]}")
+        # print(comp_hand)
+        # print(comp_sum)
     # print(usr_sum)
 
     hit = True
@@ -106,24 +113,50 @@ def blackjack():
             usr_hand.append(last_card)
             usr_sum += ref_deck.get(last_card)[1]
             readable_usr = read_card(usr_hand)
-            print(f"Your hand is {readable_usr} the dealer is showing {ref_deck.get(comp_hand[0])[0]}")
+            print("")
+            print(f"Your Cards:{readable_usr}")
+            print(f"Dealer's first card: {ref_deck.get(comp_hand[0])[0]}")
         else:
             hit = False
         if usr_sum > 21:
-            print(f"You busted! Your total was {usr_sum}. Dealer Wins.")
-            hit = False
-    while comp_sum <= 17:
+            for cards in range(len(usr_hand)):
+                if usr_hand[cards] in [49, 50, 51, 52]:
+                    usr_sum -= 10
+                    usr_hand[cards] += 4
+            if usr_sum > 21:
+                print("")
+                print(f"You busted! Your total was {usr_sum}. Dealer Wins.")
+                return
+    while comp_sum < 17 or (comp_sum == 22 and len(comp_hand) == 2):
         last_card = deal()
+        # print(last_card)
         comp_hand.append(last_card)
+        # print(comp_hand)
         comp_sum += ref_deck.get(last_card)[1]
+        # print(comp_sum)
+        if comp_sum > 21:
+            for cards in range(len(comp_hand)):
+                if comp_hand[cards] in [49, 50, 51, 52]:
+                    comp_sum -= 10
+                    comp_hand[cards] += 4
     readable_comp = read_card(comp_hand)
     readable_usr = read_card(usr_hand)
-    if  comp_sum >= 21:
-        print(f"Your hand was {readable_usr}. The dealers hand was {readable_comp} adding to {comp_sum}. The dealer Busted. You win!")
-    elif usr_sum >= comp_sum and comp_sum <= 21:
-        print(f"Your hand was {readable_usr} adding to {usr_sum} and the dealers hand was {readable_comp} adding to {comp_sum}. You win!")
+    if  comp_sum > 21:
+        for cards in comp_hand:
+            if cards in [49, 50, 51, 52]:
+                comp_sum -= 10
+        if comp_sum > 21:
+            print(f"Your hand: {readable_usr}")
+            print(f"Dealers Hand: {readable_comp}")
+            print(f"The dealer Busted. You win!")
+    elif usr_sum > comp_sum and usr_sum <= 21:
+        print(f"Your hand: {readable_usr}")
+        print(f"Dealers Hand: {readable_comp}")
+        print(f"You win!")
     else:
-        print(f"Your hand was {readable_usr} adding to {usr_sum} and the dealers hand was {readable_comp} adding to {comp_sum}. You lose!")
+        print(f"Your hand: {readable_usr}")
+        print(f"Dealers Hand: {readable_comp}")
+        print(f"You lose!")
 
 gameplay = True
 
